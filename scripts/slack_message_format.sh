@@ -75,7 +75,7 @@ construct_slack_message() {
             },"
 
     echo "        {
-                \"color\": \"#87CEEB\",
+                \"color\": \"#FF69B4\",
                 \"blocks\": [
                     {
                         \"type\": \"divider\"
@@ -86,7 +86,7 @@ construct_slack_message() {
                         \"fields\": [
                             {
                                 \"type\": \"mrkdwn\",
-                                \"text\": \"BOB says: GitHub Action summary: $action_summary_link\"
+                                \"text\": \"GitHub Action summary: $action_summary_link\"
                             }
                         ]
                     }
