@@ -36,17 +36,17 @@ runs:
         run: |
           ls -la
           pwd
-          chmod +x ./slack_message_format.sh
+          chmod +x ${{ github.action_path }}/scripts/slack_message_format.sh
           # Process data based on data_source input
           if [ "${{ inputs.data_source }}" == 'csv' ]; then
             # Process CSV file
-            ./slack_message_format.sh invalid.csv
+            ${{ github.action_path }}/scripts/slack_message_format.sh invalid.csv
           elif [ "${{ inputs.data_source }}" == 'json' ]; then
             # Process JSON document
-            ./slack_message_format.sh license_data.json
+            ${{ github.action_path }}/scripts/slack_message_format.sh license_data.json
           else
             # Default to artifact data
-            ./slack_message_format.sh licenses.json
+            ${{ github.action_path }}/scripts/slack_message_format.sh licenses.json
           fi
         shell: bash
 
