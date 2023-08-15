@@ -34,7 +34,7 @@ runs:
 
       - name: 'Process Data from Different Sources'
         run: |
-          chmod +x slack_message_format.sh
+          chmod +x scripts/slack_message_format.sh
           # Process data based on data_source input
           if [ "${{ inputs.data_source }}" == 'csv' ]; then
             # Process CSV file
