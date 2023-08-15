@@ -31,21 +31,20 @@ runs:
         with:
           name: ${{ inputs.artifact_name }}
           path: licenses.json
-        shell: bash
 
-      - name: 'Process Data from Different Sources'
+      - name: 'Process Data from Different Sour ces'
         run: |
-          chmod +x scripts/slack_message_format.sh
+          chmod +x ./slack_message_format.sh
           # Process data based on data_source input
           if [ "${{ inputs.data_source }}" == 'csv' ]; then
             # Process CSV file
-            scripts/slack_message_format.sh invalid.csv
+            ./slack_message_format.sh invalid.csv
           elif [ "${{ inputs.data_source }}" == 'json' ]; then
             # Process JSON document
-            scripts/slack_message_format.sh license_data.json
+            ./slack_message_format.sh license_data.json
           else
             # Default to artifact data
-            scripts/slack_message_format.sh licenses.json
+            ./slack_message_format.sh licenses.json
           fi
         shell: bash
 
@@ -58,5 +57,5 @@ runs:
           else
             echo "Slack webhook URL not provided. Skipping notification."
           fi
-        if: always()
         shell: bash
+        if: always()
