@@ -31,6 +31,7 @@ runs:
         with:
           name: ${{ inputs.artifact_name }}
           path: licenses.json
+        shell: bash
 
       - name: 'Process Data from Different Sources'
         run: |
@@ -57,5 +58,5 @@ runs:
           else
             echo "Slack webhook URL not provided. Skipping notification."
           fi
-        shell: bash
         if: always()
+        shell: bash
