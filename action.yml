@@ -1,0 +1,61 @@
+name: 'Flexible Slack Notification'
+description: 'Construct and send Slack notifications'
+inputs:
+  slack_webhook_url:
+    description: 'Slack webhook URL for sending notifications'
+    required: true
+  data_source:
+    description: 'Data source for license information (artifact, csv, json)'
+    required: true
+    default: 'csv'
+  artifact_name:
+    description: 'Name of the artifact containing license data'
+    required: false
+    default: 'invalid.csv'
+runs:
+  using: 'composite'
+  steps:
+      - name: 'Check if Slack webhook URL is provided'
+        run: |
+          if [ -n "${{ inputs.slack_webhook_url }}" ]; then
+            echo "Slack webhook URL provided."
+          else
+            echo "Slack webhook URL not provided. Skipping notification."
+            exit 0
+          fi
+        shell: bash
+
+      - name: 'Download License Data'
+        if: ${{ inputs.data_source == 'artifact' }}
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ inputs.artifact_name }}
+          path: licenses.json
+        shell: bash
+
+      - name: 'Process Data from Different Sources'
+        run: |
+          # Process data based on data_source input
+          if [ "${{ inputs.data_source }}" == 'csv' ]; then
+            # Process CSV file
+            ./slack_message_format.sh invalid.csv
+          elif [ "${{ inputs.data_source }}" == 'json' ]; then
+            # Process JSON document
+            ./slack_message_format.sh license_data.json
+          else
+            # Default to artifact data
+            ./slack_message_format.sh licenses.json
+          fi
+        shell: bash
+
+      - name: 'Notify on Restricted Licenses'
+        run: |
+          if [ -n "${{ inputs.slack_webhook_url }}" ]; then
+            json_data=$(cat slack_message.json)
+            escaped_json_data=$(echo "$json_data" | jq -c .)
+            curl -X POST -H 'Content-type: application/json' --data "$escaped_json_data" "${{ inputs.slack_webhook_url }}"
+          else
+            echo "Slack webhook URL not provided. Skipping notification."
+          fi
+        shell: bash
+        if: always()
