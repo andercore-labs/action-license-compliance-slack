@@ -86,7 +86,7 @@ construct_slack_message() {
                         \"fields\": [
                             {
                                 \"type\": \"mrkdwn\",
-                                \"text\": \"GitHub Action summary: $action_summary_link\"
+                                \"text\": \"BOB says: GitHub Action summary: $action_summary_link\"
                             }
                         ]
                     }
