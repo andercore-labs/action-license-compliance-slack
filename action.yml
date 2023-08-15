@@ -31,7 +31,6 @@ runs:
         with:
           name: ${{ inputs.artifact_name }}
           path: licenses.json
-        shell: bash
 
       - name: 'Process Data from Different Sources'
         run: |
