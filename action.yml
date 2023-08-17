@@ -1,63 +1,80 @@
-name: 'Flexible Slack Notification'
-description: 'Construct and send Slack notifications'
+name: 'License Compliance Slack Notification'
+description: 'Check compliance of dependency licenses and output to Slack channel'
 inputs:
   slack_webhook_url:
     description: 'Slack webhook URL for sending notifications'
     required: true
-  data_source:
-    description: 'Data source for license information (artifact, csv, json)'
+  allow_list:
+    description: 'Regex pattern for allowed licenses'
     required: true
-    default: 'csv'
-  artifact_name:
-    description: 'Name of the artifact containing license data'
-    required: false
-    default: 'invalid.csv'
+  block_list:
+    description: 'Regex pattern for blocked licenses'
+    required: true
+  runtime:
+    description: 'Project runtime'
+    required: true
+
 runs:
   using: 'composite'
   steps:
-      - name: 'Check if Slack webhook URL is provided'
-        run: |
-          if [ -n "${{ inputs.slack_webhook_url }}" ]; then
-            echo "Slack webhook URL provided."
-          else
-            echo "Slack webhook URL not provided. Skipping notification."
-            exit 0
-          fi
-        shell: bash
+    - name: 'Check out Code'
+      uses: actions/checkout@v3
 
-      - name: 'Download License Data'
-        if: ${{ inputs.data_source == 'artifact' }}
-        uses: actions/download-artifact@v3
-        with:
-          name: ${{ inputs.artifact_name }}
-          path: licenses.json
+    - name: 'Setup Environment'
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+      if: ${{ inputs.runtime == 'node' }}
 
-      - name: 'Process Data from Different Sour ces'
-        run: |
-          ls -la
-          pwd
-          chmod +x ${{ github.action_path }}/scripts/slack_message_format.sh
-          # Process data based on data_source input
-          if [ "${{ inputs.data_source }}" == 'csv' ]; then
-            # Process CSV file
-            ${{ github.action_path }}/scripts/slack_message_format.sh invalid.csv
-          elif [ "${{ inputs.data_source }}" == 'json' ]; then
-            # Process JSON document
-            ${{ github.action_path }}/scripts/slack_message_format.sh license_data.json
-          else
-            # Default to artifact data
-            ${{ github.action_path }}/scripts/slack_message_format.sh licenses.json
-          fi
-        shell: bash
+    - name: 'Setup Environment'
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.10'
+      if: ${{ inputs.runtime == 'python' }}
 
-      - name: 'Notify on Restricted Licenses'
-        run: |
-          if [ -n "${{ inputs.slack_webhook_url }}" ]; then
-            json_data=$(cat slack_message.json)
-            escaped_json_data=$(echo "$json_data" | jq -c .)
-            curl -X POST -H 'Content-type: application/json' --data "$escaped_json_data" "${{ inputs.slack_webhook_url }}"
-          else
-            echo "Slack webhook URL not provided. Skipping notification."
-          fi
-        shell: bash
-        if: always()
+    - name: 'Install Dependencies'
+      run: |
+        if [[ "${{ inputs.runtime }}" == "node" ]]; then
+          npm ci
+          npm i license-checker
+        elif [[ "${{ inputs.runtime }}" == "python" ]]; then
+          pip install -r requirements.txt
+          pip install pip-licenses
+        fi
+      shell: bash
+      if: ${{ inputs.runtime == 'node' || inputs.runtime == 'python' }}
+
+    - name: 'Run license checker'
+      run: |
+        if [[ "${{ inputs.runtime }}" == "node" ]]; then
+          npx license-checker --csv --direct >> licenses.csv
+        elif [[ "${{ inputs.runtime }}" == "python" ]]; then
+          pip-licenses --format=csv --with-urls --no-version --output-file=licenses.csv
+        fi
+      shell: bash
+      if: ${{ inputs.runtime == 'node' || inputs.runtime == 'python' }}
+
+    - name: 'Check Dependencies Licenses'
+      run: |
+        chmod +x ${{ github.action_path }}/scripts/license_check.sh
+        ${{ github.action_path }}/scripts/license_check.sh licenses.csv "${{ inputs.allow_list }}" "${{ inputs.block_list }}"
+      shell: bash
+      
+    - name: 'Format Output as JSON'
+      run: |
+        chmod +x ${{ github.action_path }}/scripts/slack_message_format.sh
+        ${{ github.action_path }}/scripts/slack_message_format.sh blocked_licenses.csv
+      shell: bash
+      if: always()
+
+    - name: 'Notify on Restricted Licenses'
+      run: |
+        if [ -n "${{ inputs.slack_webhook_url }}" ]; then
+          json_data=$(cat slack_message.json)
+          escaped_json_data=$(echo "$json_data" | jq -c .)
+          curl -X POST -H 'Content-type: application/json' --data "$escaped_json_data" ${{ inputs.slack_webhook_url }}
+        else
+          echo "Slack webhook URL not provided. Skipping notification."
+        fi
+      shell: bash
+      if: always()
