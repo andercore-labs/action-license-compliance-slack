@@ -13,6 +13,14 @@ inputs:
   runtime:
     description: 'Project runtime'
     required: true
+  python_version:
+    description: 'Python version'
+    required: false
+    default: '3.10'
+  node_version:
+    description: 'Node.js version'
+    required: false
+    default: '18'
 
 runs:
   using: 'composite'
@@ -21,16 +29,16 @@ runs:
       uses: actions/checkout@v3
 
     - name: 'Setup Environment'
+      if: ${{ inputs.runtime == 'node' }}
       uses: actions/setup-node@v3
       with:
-        node-version: 18
-      if: ${{ inputs.runtime == 'node' }}
+        node-version: ${{ inputs.node_version }}
 
     - name: 'Setup Environment'
+      if: ${{ inputs.runtime == 'python' }}
       uses: actions/setup-python@v3
       with:
-        python-version: '3.10'
-      if: ${{ inputs.runtime == 'python' }}
+        python-version: ${{ inputs.python_version }}
 
     - name: 'Install Dependencies'
       run: |
