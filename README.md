@@ -37,14 +37,7 @@ jobs:
           block_list: ${{ env.BLOCK_LIST }}
         if: always()
 ```
-This example workflow sets up the Slack Notification GitHub Action to run on push events to the main branch and on pull requests. Ensure that the necessary secrets (SLACK_WEBHOOK_URL) are properly configured in your repository settings.
-
-## Workflow Steps
-
-- Check if Slack webhook URL is provided: This step verifies if the Slack webhook URL is provided. If not provided, the notification is skipped.
-- Download License Data: Downloads license data from an artifact if the data source is set to 'artifact'.
-- Process Data from Different Sources: Processes the license data based on the data source input. The script used for formatting is 'slack_message_format.sh'.
-- Notify on Restricted Licenses: Sends a notification to Slack if a Slack webhook URL is provided.
+This example workflow sets up the Arazutech License Compliance Checker GitHub Action to run on push events to the main branch and on pull requests. Ensure that the necessary secrets and variables (SLACK_WEBHOOK_URL, REGEX_ALLOW_LIST, and REGEX_BLOCK_LIST) are properly configured in your repository settings.
 
 ## License
 
