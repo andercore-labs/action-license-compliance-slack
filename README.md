@@ -49,6 +49,3 @@ This example workflow sets up the Slack Notification GitHub Action to run on pus
 ## License
 
 This GitHub Action is licensed under the MIT License.
-
-
-Please note that the above README assumes the existence of a script named `slack_message_format.sh` for processing and formatting license data. You should replace this with the appropriate script or code for processing license data based on your specific requirements. Additionally, make sure to replace placeholders like `arazutech/action-slack-notification@v10` with the actual reference to your GitHub Action in the GitHub Marketplace.
