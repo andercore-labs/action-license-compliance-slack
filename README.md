@@ -40,7 +40,7 @@ jobs:
           python_version: '3.9'
         if: always()
 ```
-This example workflow sets up the Arazutech License Compliance Checker GitHub Action to run on push events to the main branch and on pull requests. Ensure that the necessary secrets and variables (SLACK_WEBHOOK_URL, REGEX_ALLOW_LIST, and REGEX_BLOCK_LIST) are properly configured in your repository settings.
+This example workflow sets up the Andercore License Compliance Checker GitHub Action to run on push events to the main branch and on pull requests. Ensure that the necessary secrets and variables (SLACK_WEBHOOK_URL, REGEX_ALLOW_LIST, and REGEX_BLOCK_LIST) are properly configured in your repository settings.
 
 ## License
 
