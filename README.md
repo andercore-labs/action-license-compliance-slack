@@ -1,6 +1,6 @@
 # License Compliance Check to Slack
 
-The Arazutech License Compliance Checker Slack Action helps you maintain license compliance by verifying the licenses of Python/Node dependencies in your projects. It automatically scans your dependencies and outputs to a Slack channel.
+The Andercore License Compliance Checker Slack Action helps you maintain license compliance by verifying the licenses of Python/Node dependencies in your projects. It automatically scans your dependencies and outputs to a Slack channel.
 
 ## Inputs
 
@@ -31,7 +31,7 @@ jobs:
       BLOCK_LIST: ${{ vars.LICENSE_CHECK_REGEX_BLOCK_LIST }}
     steps:
        - name: License Compliance Check to Slack
-        uses: arazutech/action-slack-notification@v12
+        uses: andercore-labs/action-slack-notification@v12
         with:
           runtime: ${{ env.RUNTIME }}
           slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
